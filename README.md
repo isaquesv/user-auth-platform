@@ -1,12 +1,28 @@
-# 📌 Sobre o projeto
-O <b>user-auth-platform</b> é uma aplicação web desenvolvida utilizando Java e Maven, focada na implementação de funcionalidades essenciais para autenticação e gerenciamento de usuários. O sistema permite que os usuários realizem:
-- <b>Cadastro de conta</b> com envio e reenvio de e-mails de confirmação.
-- <b>Login</b> com validação de credenciais.
-- <b>Recuperação de senha</b> com envio e reenvio de e-mails para redefinição.
+# Plataforma de Autenticação de Usuários
 
-Este projeto foi desenvolvido para treinar e aprimorar minhas habilidades de programação e explorar a API Brevo, responsável pela integração de envio de e-mails.
+![GitHub repo size](https://img.shields.io/github/repo-size/isaquesv/user-auth-platform?style=for-the-badge)
+![GitHub language count](https://img.shields.io/github/languages/count/isaquesv/user-auth-platform?style=for-the-badge)
+![GitHub forks](https://img.shields.io/github/forks/isaquesv/user-auth-platform?style=for-the-badge)
+![Bitbucket open issues](https://img.shields.io/bitbucket/issues/isaquesv/user-auth-platform?style=for-the-badge)
+![Bitbucket open pull requests](https://img.shields.io/bitbucket/pr-raw/isaquesv/user-auth-platform?style=for-the-badge)
 
-# 🛠️ Tecnologias utilizadas
+<img src="https://github.com/user-attachments/assets/f67aee99-3414-4fef-85e6-6a7051c5db7d" alt="Exemplo imagem">
+
+> Aplicação web construída com Java e Maven que oferece funcionalidades de registro de usuário, login e redefinição de senha, com notificações por e-mail automatizadas.
+
+### Objetivos
+
+Este projeto foi desenvolvido com a expectativa de atender aos seguintes objetivos:
+
+- [x] Permitir o cadastro do usuário
+- [x] Permitir o login do usuário
+- [x] Permitir a alteração de senha do usuário
+- [x] Realizar o envio e reenvio de e-mails de confirmação de cadastro
+- [x] Realizar o envio e reenvio de e-mails de alteração de senha
+- [x] Validar tokens de confirmação de cadastro e alteração de senha
+
+## 💻 Tecnologias
+
 - <b>Linguagem:</b> Java
 - <b>Gerenciador de Dependências:</b> Maven
 - <b>JDK:</b> 19.0.2
@@ -16,7 +32,8 @@ Este projeto foi desenvolvido para treinar e aprimorar minhas habilidades de pro
 - <b>Framework:</b> Jakarta EE 10 Web
 - <b>API de Integração de E-mail:</b> Brevo
 
-# 📄 Instruções
+## ☕ Usando
+
 Para que o sistema funcione corretamente, é necessário possuir uma <b>API KEY</b> e o <b>e-mail</b> da sua conta no site da <b>API Brevo</b>.
 Com esses dados em mãos, siga os passos abaixo:
 
