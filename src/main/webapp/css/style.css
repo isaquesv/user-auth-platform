@@ -1,0 +1,62 @@
+/* 
+    Author     : isaquesv
+*/
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: arial;
+    background-color: #F5F5F5;
+}
+
+main {
+    width: 468px;
+    border: 1px solid #BFBFBF;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+}
+
+div section label, div section input, div section p {
+    width: 100%;
+}
+
+div section input, div section section i {
+    color: #757575;
+    border: 1px solid #D7D6D6;
+    border-radius: 6px;
+    background-color: #F7F7F7;
+}
+
+div section section i {
+    cursor: pointer;
+}
+
+div section section i:hover {
+    background-color: #EDEDED;
+}
+
+div section section {
+    display: flex;
+}
+
+input[TYPE=SUBMIT], #buttonShowRegistrationForm {
+    width: 100%;
+    color: white;
+    font-weight: bold;
+}
+
+input:disabled {
+    cursor: not-allowed;
+}
+
+main div#divVerificationCode p.warning, main div#divForgotPasswordForm p.warning {
+    color: #757575;
+    border: 1px solid #D7D6D6;
+    border-radius: 8px;
+    background-color: #F7F7F7;
+}
