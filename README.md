@@ -21,18 +21,25 @@ Este projeto foi desenvolvido com a expectativa de atender aos seguintes objetiv
 - [x] Realizar o envio e reenvio de e-mails de alteração de senha
 - [x] Validar tokens de confirmação de cadastro e alteração de senha
 
-## 💻 Tecnologias
+## 💻 Tecnologias e Ferramentas Utilizadas
 
+<b>Back-End</b>
 - <b>Linguagem:</b> Java
 - <b>Gerenciador de Dependências:</b> Maven
 - <b>JDK:</b> 19.0.2
 - <b>Formato Source/Binary:</b> 19
-- <b>IDE:</b> NetBeans 22
-- <b>Servidor de Aplicação:</b> Glassfish Server 7.0
 - <b>Framework:</b> Jakarta EE 10 Web
+- <b>Servidor de Aplicação:</b> Glassfish Server 7.0
 - <b>API de Integração de E-mail:</b> Brevo
 
-## ☕ Usando
+<b>Front-End</b>
+- <b>Linguagens:</b> HTML, CSS, JavaScript
+- <b>Frameworks e Bibliotecas:</b> Bootstrap 5, Ajax
+
+<b>Ambiente de Desenvolvimento</b>
+- <b>IDE:</b> NetBeans 22
+
+## ✉ Configuração da API Brevo
 
 Para que o sistema funcione corretamente, é necessário possuir uma <b>API KEY</b> e o <b>e-mail</b> da sua conta no site da <b>API Brevo</b>.
 Com esses dados em mãos, siga os passos abaixo:
@@ -46,6 +53,6 @@ Demonstração:
 
 https://github.com/user-attachments/assets/7fa9372c-5a14-404f-9768-0e8d3f89a565
 
-# 🎥 Demonstração do funcionamento
+# ☕ Demonstração do funcionamento
 
 https://github.com/user-attachments/assets/42d22ec3-6637-49a8-9e25-558ec23ef4cd
