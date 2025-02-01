@@ -28,7 +28,7 @@ public class HashUtil {
         * @return                       Retorna true se a senha informada corresponder ao hash armazenado, caso contrário retorna false.
         * @author                       isaquesv
     */
-   public static boolean checkHash(String password, String storedHash) {
-       return BCrypt.checkpw(password, storedHash);
+   public static boolean checkHash(String password, String storedHashedPassword) {
+       return BCrypt.checkpw(password, storedHashedPassword);
    }
 }

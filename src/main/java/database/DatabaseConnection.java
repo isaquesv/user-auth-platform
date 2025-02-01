@@ -5,18 +5,20 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
-    * Classe responsável por gerenciar a conexão com o banco de dados
+    * Classe responsável por gerenciar a conexão com o banco de dados.
+    * 
     * @author isaquesv
     * @since v1.0
 */
 public class DatabaseConnection {
     /**
         * @param CLASS_NAME    Nome da classe do SQLite.
-        * @param URL           URL para o banco de dados criado.
+        * @param URL           URL do banco de dados.
     */
     public static final String CLASS_NAME = "org.sqlite.JDBC";
     public static final String URL = "jdbc:sqlite:user_auth_plataform.db?journal_mode=WAL";
 
+    
     /**
         * Cria a conexão com o banco de dados.
         * 

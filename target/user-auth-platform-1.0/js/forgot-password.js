@@ -1,67 +1,74 @@
-const inputEmail = document.querySelector('#inputEmail');
-inputEmail.focus();
+const emailInput = document.querySelector('#emailInput');
+emailInput.focus();
 
-const buttonSendForgotPasswordEmail = document.querySelector('#buttonSendForgotPasswordEmail');
-const buttonResendForgotPasswordEmail = document.querySelector('#buttonResendForgotPasswordEmail');
-buttonSendForgotPasswordEmail.addEventListener('click', function(){
-    let email = inputEmail.value.trim();
-    validateEmail(email);
+emailInput.addEventListener('keypress', function (event) {
+    // Quando a tecla "Enter" for pressionada enquanto o input de e-mail estiver em foco
+    if (event.key === "Enter") {
+        let email = emailInput.value.trim();
+        
+        event.preventDefault();
+        validateEmailFormat(email);
+    }
 });
-buttonResendForgotPasswordEmail.addEventListener('click', function(){
-    let email = inputEmail.value.trim();
-    sendUserForgotPasswordEmail(true, email);
+
+const sendForgotPasswordEmailButton = document.querySelector('#sendForgotPasswordEmailButton');
+sendForgotPasswordEmailButton.addEventListener('click', function(){
+    let email = emailInput.value.trim();
+    validateEmailFormat(email);
 });
 
-const sectionInputEmail = document.querySelector('#sectionInputEmail');
+const resendForgotPasswordEmailButton = document.querySelector('#resendForgotPasswordEmailButton');
+resendForgotPasswordEmailButton.addEventListener('click', function(){
+    let email = emailInput.value.trim();
+    sendForgotPasswordEmail(true, email);
+});
 
-const warningEmail = document.querySelector('#warningEmail');
-const warningConfirmationRequired = document.querySelector('#warningConfirmationRequired');
+const forgotPasswordContainer = document.querySelector('#forgotPasswordContainer');
+const forgotPasswordEmailVerificationRequiredContainer = document.querySelector('#forgotPasswordEmailVerificationRequiredContainer');
+const emailInputSection = document.querySelector('#emailInputSection');
+const emailMessage = document.querySelector('#emailMessage');
+const forgotPasswordResponseMessage = document.querySelector('#forgotPasswordResponseMessage');
 
-/**
-    * Verifica se o e-mail informado é ou não válido.
+
+/*
+    * Verifica se o e-mail informado é válido ou não.
     *
     * @function
-    * @param {String} email - E-mail informado pelo usuário.
-    * @returns {Boolean} O resultado da validação indicando se o e-mail informado é ou não válido.
-    * @description 
-    * - Caso o e-mail esteja vazio, exibe: "Por favor, insira um e-mail."
-    * - Caso o e-mail seja inválido, exibe: "Por favor, insira um e-mail válido."
-    * - Caso o e-mail seja válido, limpa qualquer mensagem anterior e verifica se o e-mail esta em uso.
+    * @param {String} email - E-mail do usuário.
+    * @returns {Boolean} - Resultado da validação do e-mail.
     * @author isaquesv
     * @since 1.0
 */
-async function validateEmail(email) {
-    if (email.length === 0) {
-        warningEmail.innerHTML = "Por favor, insira um e-mail.";
-    } else if (!inputEmail.checkValidity()) {
-        warningEmail.innerHTML = "Por favor, insira um e-mail válido.";
+async function validateEmailFormat(email) {
+    if (email.length == 0) {
+        emailMessage.innerHTML = "Por favor, insira um e-mail.";
+    } else if (emailInput.checkValidity() == false) {
+        emailMessage.innerHTML = "Por favor, insira um e-mail válido.";
     } else {
-        warningEmail.innerHTML = "";
-        let isEmailAvailable = await checkEmailExistence(email);
+        emailMessage.innerHTML = "";
+        let isEmailExistsInDatabase = await checkIfEmailExistsInDatabase(email);
 
-        if (!isEmailAvailable) {
-            sendUserForgotPasswordEmail(false, email);
+        if (isEmailExistsInDatabase == false) {
+            sendForgotPasswordEmail(false, email);
         }
     }
 }
 
-/**
-    * Verifica se o e-mail informado esta ou não disponível.
+/*
+    * Verifica se o e-mail informado existe ou não no banco de dados.
     *
     * @function
-    * @param {String} email - E-mail informado pelo usuário.
-    * @returns {Boolean} O resultado da validação indicando se o e-mail informado esta disponível ou não.
-    * @description 
-    * - Caso ocorra um erro inesperado ao tentar validar a existência do e-mail, exibe: "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente."
+    * @param {String} email - E-mail do usuário.
+    * @returns {Boolean} - Resultado da existência do e-mail.
     * @author isaquesv
     * @since 1.0
 */
-async function checkEmailExistence(email) {
+async function checkIfEmailExistsInDatabase(email) {
     try {
-        const emailSelectResultJSON = await new Promise((resolve, reject) => {
+        const emailExistenceResponse = await new Promise((resolve, reject) => {
             $.ajax({
                 method: 'POST',
-                url: 'CheckUserEmailExistenceServlet',
+                url: 'CheckIfEmailExistsInDatabaseServlet',
                 data: {
                     email: email
                 },
@@ -75,63 +82,83 @@ async function checkEmailExistence(email) {
             });
         });
         
-        if (emailSelectResultJSON.isEmailAvailable) {
-            warningEmail.innerHTML = emailSelectResultJSON.message;
-            return true;
+        if (emailExistenceResponse.isEmailExistsInDatabase == true) {
+            emailMessage.innerHTML = emailExistenceResponse.message;
         } else {
-            warningEmail.innerHTML = "";
-            return false;            
+            emailMessage.innerHTML = "";
         }
+        
+        return emailExistenceResponse.isEmailExistsInDatabase;
     } catch (error) {
         console.log("Erro: " + error.message);
-        warningEmail.innerHTML = "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente.";
+        emailMessage.innerHTML = "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente.";
         return false;
     }
 }
 
-/**
-    * Envia um e-mail de alteração de senha.
+/*
+    * Envia o e-mail de solicitação de alteração da senha do usuário.
     *
     * @function
-    * @param {Boolean} isEmailResent - Se a chamada da função se refere a um reenvio de e-mail de alteração de senha ou não.
-    * @param {String} email - E-mail fornecido pelo usuário.
-    * @description 
-    * - Caso a chamada da função seja um reenvio de e-mail, exibe: "E-mail reenviado..."
-    * - Caso a chamada da função não seja um reenvio de e-mail, exibe a mensagem retornada.
-    * - Caso ocorra um erro inesperado ao tentar enviar o e-mail de alteração de senha, exibe: "Houve um erro ao tentar enviar o e-mail de recuperação de senha. Tente novamente."
+    * @param {Boolean} isForgotPasswordEmailResent - Para saber se é um reenvio de e-mail ou não.
+    * @param {String} email - E-mail do usuário.
     * @author isaquesv
     * @since 1.0
 */
-function sendUserForgotPasswordEmail(isEmailResent, email) {
+function sendForgotPasswordEmail(isForgotPasswordEmailResent, email) {
     $.ajax({
         method: 'POST',
-        url: 'SendUserForgotPasswordEmailServlet',
+        url: 'SendForgotPasswordEmailServlet',
         data: {
             email: email
         },
         dataType: 'json',
-        success: function (emailSendResultJSON) {
-            if (emailSendResultJSON.isEmailSentSuccessfully) {
-                if (!sectionInputEmail.classList.contains('d-none')) {
-                    sectionInputEmail.classList.add('d-none');
-                }
-                if (!buttonSendForgotPasswordEmail.classList.contains('d-none')) {
-                    buttonSendForgotPasswordEmail.classList.add('d-none');
-                }
-                if (buttonResendForgotPasswordEmail.classList.contains('d-none')) {
-                    buttonResendForgotPasswordEmail.classList.remove('d-none');
-                }
-            }
+        success: function (forgotPasswordEmailResponse) {
+            if (forgotPasswordEmailResponse.isForgotPasswordEmailSent == true) {
+                showOrHideForgotPasswordForm(true);
+                emailMessage.innerHTML = "";
                 
-            if (isEmailResent) {
-                warningConfirmationRequired.innerHTML = "<b>E-mail reenviado</b>. " + emailSendResultJSON.message;
+                if (isForgotPasswordEmailResent == true) {
+                    forgotPasswordResponseMessage.innerHTML = "<b>E-mail reenviado</b>. " + forgotPasswordEmailResponse.message;
+                } else {
+                    forgotPasswordResponseMessage.innerHTML = forgotPasswordEmailResponse.message;
+                }
             } else {
-                warningConfirmationRequired.innerHTML = emailSendResultJSON.message;
+                showOrHideForgotPasswordForm(false);
+                
+                forgotPasswordResponseMessage.innerHTML = "";
+                emailMessage.innerHTML = forgotPasswordEmailResponse.message;
             }
         },
         error: function (xhr, status, error) {
             console.log("Erro: " + error);
-            warningEmail.innerHTML = "Houve um erro ao tentar enviar o e-mail de alteração de senha. Tente novamente.";
+            emailMessage.innerHTML = "Houve um erro ao tentar enviar o e-mail de alteração de senha. Tente novamente.";
         }
     });
+}
+
+/*
+    * Exibe ou esconde o formulário de esqueci minha senha.
+    *
+    * @function
+    * @param {Boolean} isToShow - Para saber se é para exibir o formulário de esqueci minha senha ou não.
+    * @author isaquesv
+    * @since 1.0
+*/
+function showOrHideForgotPasswordForm(isToShow) {
+    if (isToShow == true) {
+        if (forgotPasswordContainer.classList.contains('d-none') == false) {
+            forgotPasswordContainer.classList.add('d-none');
+        }
+        if (forgotPasswordEmailVerificationRequiredContainer.classList.contains('d-none') == true) {
+            forgotPasswordEmailVerificationRequiredContainer.classList.remove('d-none');
+        }
+    } else {
+        if (forgotPasswordContainer.classList.contains('d-none') == true) {
+            forgotPasswordContainer.classList.remove('d-none');
+        }
+        if (forgotPasswordEmailVerificationRequiredContainer.classList.contains('d-none') == false) {
+            forgotPasswordEmailVerificationRequiredContainer.classList.add('d-none');
+        }
+    }
 }

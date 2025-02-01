@@ -1,63 +1,74 @@
-const inputEmail = document.querySelector('#inputEmail');
-const inputPassword = document.querySelector('#inputPassword');
-inputEmail.focus();
+const emailInput = document.querySelector('#emailInput');
+emailInput.focus();
 
-const iViewOrHidePassword = document.querySelector('#viewOrHidePassword');
-iViewOrHidePassword.addEventListener('click', function(){
-    viewOrHidePassword(inputPassword, iViewOrHidePassword);
+emailInput.addEventListener('keypress', function (event) {
+    // Quando a tecla "Enter" for pressionada enquanto o input de e-mail estiver em foco
+    if (event.key === "Enter") {
+        event.preventDefault();
+        validateLoginForm();
+    }
 });
 
-const buttonLoginUser = document.querySelector('#buttonLoginUser');
-buttonLoginUser.addEventListener('click', function(){
-    validateForm();
+const passwordInput = document.querySelector('#passwordInput');
+passwordInput.addEventListener('keypress', function (event) {
+    // Quando a tecla "Enter" for pressionada enquanto o input de senha estiver em foco
+    if (event.key === "Enter") {
+        event.preventDefault();
+        validateLoginForm();
+    }
 });
 
-const warningEmail = document.querySelector('#warningEmail');
-const warningPassword = document.querySelector('#warningPassword');
+const viewOrHidePasswordInputIcon = document.querySelector('#viewOrHidePasswordInputIcon');
+viewOrHidePasswordInputIcon.addEventListener('click', function(){
+    viewOrHidePassword(passwordInput, viewOrHidePasswordInputIcon);
+});
 
-/**
-    * Verifica se o e-mail informado é ou não válido.
+const loginButton = document.querySelector('#loginButton');
+loginButton.addEventListener('click', function(){
+    validateLoginForm();
+});
+
+const emailMessage = document.querySelector('#emailMessage');
+const passwordMessage = document.querySelector('#passwordMessage');
+
+
+/*
+    * Verifica se o e-mail informado é válido ou não.
     *
     * @function
-    * @param {String} email - E-mail informado pelo usuário.
-    * @returns {Boolean} O resultado da validação indicando se o e-mail informado é ou não válido.
-    * @description 
-    * - Caso o e-mail esteja vazio, exibe: "Por favor, insira um e-mail."
-    * - Caso o e-mail seja inválido, exibe: "Por favor, insira um e-mail válido."
-    * - Caso o e-mail seja válido, limpa qualquer mensagem anterior.
+    * @param {String} email - E-mail do usuário.
+    * @returns {Boolean} - Resultado da validação do e-mail.
     * @author isaquesv
     * @since 1.0
 */
-function validateEmail(email) {
-    if (email.length === 0) {
-        warningEmail.innerHTML = "Por favor, insira um e-mail.";
+function validateEmailFormat(email) {
+    if (email.length == 0) {
+        emailMessage.innerHTML = "Por favor, insira um e-mail.";
         return false;
-    } else if (!inputEmail.checkValidity()) {
-        warningEmail.innerHTML = "Por favor, insira um e-mail válido.";
+    } else if (emailInput.checkValidity() == false) {
+        emailMessage.innerHTML = "Por favor, insira um e-mail válido.";
         return false;
     } else {
-        warningEmail.innerHTML = "";
+        emailMessage.innerHTML = "";
         return true;
     }
 }
 
-/**
-    * Verifica se o e-mail informado esta ou não disponível.
+/*
+    * Verifica se o e-mail informado existe ou não no banco de dados.
     *
     * @function
-    * @param {String} email - E-mail informado pelo usuário.
-    * @returns {Boolean} O resultado da validação indicando se o e-mail informado esta disponível ou não.
-    * @description 
-    * - Caso ocorra um erro inesperado ao tentar validar a existência do e-mail, exibe: "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente."
+    * @param {String} email - E-mail do usuário.
+    * @returns {Boolean} - Resultado da existência do e-mail.
     * @author isaquesv
     * @since 1.0
 */
-async function checkEmailExistence(email) {
+async function checkIfEmailExistsInDatabase(email) {
     try {
-        const emailSelectResultJSON = await new Promise((resolve, reject) => {
+        const emailExistenceResponse = await new Promise((resolve, reject) => {
             $.ajax({
                 method: 'POST',
-                url: 'CheckUserEmailExistenceServlet',
+                url: 'CheckIfEmailExistsInDatabaseServlet',
                 data: {
                     email: email
                 },
@@ -71,66 +82,59 @@ async function checkEmailExistence(email) {
             });
         });
         
-        if (emailSelectResultJSON.isEmailAvailable) {
-            warningEmail.innerHTML = emailSelectResultJSON.message;
-            return true;
+        if (emailExistenceResponse.isEmailExistsInDatabase == true) {
+            emailMessage.innerHTML = emailExistenceResponse.message;
         } else {
-            warningEmail.innerHTML = "";
-            return false;            
+            emailMessage.innerHTML = "";
         }
+        
+        return emailExistenceResponse.isEmailExistsInDatabase;
     } catch (error) {
         console.log("Erro: " + error.message);
-        warningEmail.innerHTML = "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente.";
+        emailMessage.innerHTML = "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente.";
         return false;
     }
 }
 
-/**
-    * Verifica se a senha informada é ou não válida.
+/*
+    * Verifica se a senha informada é válida ou não.
     *
     * @function
-    * @param {String} password - Senha informada pelo usuário.
-    * @returns {Boolean} O resultado da validação indicando se a senha informada é ou não válida.
-    * @description 
-    * - Caso a senha esteja vazia, exibe: "Por favor, insira uma senha."
-    * - Caso a senha tenha menos de 8 caracteres, exibe: "A senha deve ter pelo menos 8 caracteres."
-    * - Caso a senha seja válida, limpa qualquer mensagem anterior.
+    * @param {String} password - Senha do usuário.
+    * @returns {Boolean} - Resultado da validação da senha.
     * @author isaquesv
     * @since 1.0
 */
-function validatePassword(password) {
-    if (password.length === 0) {
-        warningPassword.innerHTML = "Por favor, insira uma senha.";
+function validatePasswordFormat(password) {
+    if (password.length == 0) {
+        passwordMessage.innerHTML = "Por favor, insira uma senha.";
         return false;
     } else if (password.length < 8) {
-        warningPassword.innerHTML = "A senha deve ter pelo menos 8 caracteres.";
+        passwordMessage.innerHTML = "A senha deve ter pelo menos 8 caracteres.";
         return false;
     } else {
-        warningPassword.innerHTML = "";
+        passwordMessage.innerHTML = "";
         return true;
     }
 }
 
-/**
-    * Verifica se os campos do formulário são ou não válidos.
+/*
+    * Valida o formulário de login, seus campos.
     *
     * @function
-    * @description 
-    * - Caso o e-mail seja válido, verifica se o e-mail está disponível
-    * - Caso o e-mail já esteja cadastrado e o campo senha esteja válido, realiza login
     * @author isaquesv
     * @since 1.0
 */
-async function validateForm() {
-    let email = inputEmail.value.trim();
-    let password = inputPassword.value.trim();
+async function validateLoginForm() {
+    let email = emailInput.value.trim();
+    let password = passwordInput.value.trim();
     
-    let isEmailValid = validateEmail(email);
+    let isEmailValid = validateEmailFormat(email);
     let isEmailAvailable = false;
-    let isPasswordValid  = validatePassword(password);
+    let isPasswordValid  = validatePasswordFormat(password);
     
     if (isEmailValid) {
-        isEmailAvailable = await checkEmailExistence(email);
+        isEmailAvailable = await checkIfEmailExistsInDatabase(email);
     }
     
     if (isEmailValid && !isEmailAvailable && isPasswordValid) {
@@ -138,90 +142,86 @@ async function validateForm() {
     }
 }
 
-/**
-    * Verifica login do usuário.
+/*
+    * Verifica se o login é válido ou não.
     *
     * @function
-    * @param {String} email - E-mail informado pelo usuário.
-    * @param {String} password - Senha informada pelo usuário.
-    * @description 
-    * - Caso o login seja um sucesso, envia o usuário para a página home.
-    * - Caso o login não seja um sucesso, exibe uma mensagem.
-    * - Caso ocorra um erro inesperado ao tentar enviar o e-mail de confirmação de cadastro, exibe: "Houve um erro ao tentar cadastra-lo em nosso sistema. Tente novamente."
+    * @param {String} email - E-mail do usuário.
+    * @param {String} password - Senha do usuário.
     * @author isaquesv
     * @since 1.0
 */
 function verifyLogin(email, password) {
     $.ajax({
         method: 'POST',
-        url: 'VerifyUserLoginServlet',
+        url: 'VerifyLoginServlet',
         data: {
             email: email,
             password: password
         },
         dataType: 'json',
-        success: function (userSelectResultJSON) {
-            if (userSelectResultJSON.isLoginVerifiedSuccessfully) {
-                disableForm();
+        success: function (loginVerificationResponse) {
+            if (loginVerificationResponse.isLoginCorrect == true) {
+                disableLoginInputs();
                 
                 window.location.href = "home.jsp";
             } else {
-                warningEmail.innerHTML = userSelectResultJSON.message;
+                emailMessage.innerHTML = loginVerificationResponse.message;
             }
         },
         error: function (xhr, status, error) {
             console.log("Erro: " + error);
-            warningEmail.innerHTML = "Houve um erro ao tentar realizar seu login em nosso sistema. Tente novamente.";
+            emailMessage.innerHTML = "Houve um erro ao tentar realizar seu login em nosso sistema. Tente novamente.";
         }
     });
 }
 
-/**
-    * Desabilita os campos e elementos presentes no formulário de login.
+/*
+    * Desabilita o formulário de login.
     *
     * @function
     * @author isaquesv
     * @since 1.0
 */
-function disableForm() {
-    if (!inputEmail.hasAttribute('disabled')) {
-        inputEmail.setAttribute('disabled', '');
+function disableLoginInputs() {
+    if (emailInput.hasAttribute('disabled') == false) {
+        emailInput.setAttribute('disabled', '');
     }
-    if (!inputPassword.hasAttribute('disabled')) {
-        inputPassword.setAttribute('disabled', '');
+    if (passwordInput.hasAttribute('disabled') == false) {
+        passwordInput.setAttribute('disabled', '');
     }
-    if (!buttonLoginUser.hasAttribute('disabled')) {
-        buttonLoginUser.setAttribute('disabled', '');
+    if (loginButton.hasAttribute('disabled') == false) {
+        loginButton.setAttribute('disabled', '');
     }
 }
 
-/**
-    * Exibe ou não o valor do campo senha.
+/*
+    * Exibe ou esconde o valor do campo senha.
     *
     * @function
-    * @param {Element} elementInputPassword - Campo senha que deve ter o seu atributo "type" alterado.
-    * @param {Element} elementIconPassword - Ícone senha que deve ter a sua classe alterada.
+    * @param {Element} passwordInput - Elemento INPUT da senha.
+    * @param {Element} viewOrHidePasswordInputIcon - Elemento I, olho, da senha.
     * @author isaquesv
     * @since 1.0
 */
-function viewOrHidePassword(elementInputPassword, elementIconPassword) {
-    if (elementInputPassword.type == 'password') {
-        elementInputPassword.type = 'text';
+function viewOrHidePassword(passwordInput, viewOrHidePasswordInputIcon) {
+    if (passwordInput.type == 'password') {
+        passwordInput.type = 'text';
         
-        if (!elementIconPassword.classList.contains('bi-eye-slash')) {
-            elementIconPassword.classList.add('bi-eye-slash');
+        if (viewOrHidePasswordInputIcon.classList.contains('bi-eye-slash') == false) {
+            viewOrHidePasswordInputIcon.classList.add('bi-eye-slash');
         }
-        if (elementIconPassword.classList.contains('bi-eye')) {
-            elementIconPassword.classList.remove('bi-eye');
+        if (viewOrHidePasswordInputIcon.classList.contains('bi-eye') == true) {
+            viewOrHidePasswordInputIcon.classList.remove('bi-eye');
         }
     } else {
-        elementInputPassword.type = 'password';
+        passwordInput.type = 'password';
         
-        if (!elementIconPassword.classList.contains('bi-eye')) {
-            elementIconPassword.classList.add('bi-eye');
+        if (viewOrHidePasswordInputIcon.classList.contains('bi-eye') == false) {
+            viewOrHidePasswordInputIcon.classList.add('bi-eye');
         }
-        if (elementIconPassword.classList.contains('bi-eye-slash')) {
-            elementIconPassword.classList.remove('bi-eye-slash');
+        if (viewOrHidePasswordInputIcon.classList.contains('bi-eye-slash') == true) {
+            viewOrHidePasswordInputIcon.classList.remove('bi-eye-slash');
         }
     }
 }

@@ -44,7 +44,7 @@ div section section {
     display: flex;
 }
 
-input[TYPE=SUBMIT], #buttonShowRegistrationForm {
+input[TYPE=SUBMIT], #backToRegisterFormButton {
     width: 100%;
     color: white;
     font-weight: bold;
@@ -54,7 +54,7 @@ input:disabled {
     cursor: not-allowed;
 }
 
-main div#divVerificationCode p.warning, main div#divForgotPasswordForm p.warning {
+main div#registerEmailVerificationRequiredContainer p.warning, main div#forgotPasswordContainer p.warning, main div#forgotPasswordEmailVerificationRequiredContainer p.warning {
     color: #757575;
     border: 1px solid #D7D6D6;
     border-radius: 8px;

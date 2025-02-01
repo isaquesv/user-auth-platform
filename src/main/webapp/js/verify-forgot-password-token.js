@@ -1,89 +1,87 @@
 const urlParameters = window.location.search;
 const parameters = new URLSearchParams(urlParameters);
-const token = parameters.get('token');
-let email;
+const forgotPasswordToken = parameters.get('FPT');
 
-const divErrorMessage = document.querySelector('#divErrorMessage');
-const errorMessage = document.querySelector('#errorMessage');
+const invalidTokenContainer = document.querySelector('#invalidTokenContainer');
+const invalidTokenMessage = document.querySelector('#invalidTokenMessage');
 
-const divChangePassword = document.querySelector('#divChangePassword');
-const inputPassword = document.querySelector('#inputPassword');
+const changePasswordContainer = document.querySelector('#changePasswordContainer');
+const passwordInput = document.querySelector('#passwordInput');
 
-const iViewOrHidePassword = document.querySelector('#viewOrHidePassword');
-iViewOrHidePassword.addEventListener('click', function(){
-    viewOrHidePassword(inputPassword, iViewOrHidePassword);
+passwordInput.addEventListener('keypress', function (event) {
+    // Quando a tecla "Enter" for pressionada enquanto o input de nova senha estiver em foco
+    if (event.key === "Enter") {
+        event.preventDefault();
+        
+        let password = passwordInput.value.trim();
+        validatePasswordFormat(password);
+    }
 });
 
-const buttonChangePassword = document.querySelector('#buttonChangePassword');
-buttonChangePassword.addEventListener('click', function(){
-    let password = inputPassword.value.trim();
-    validatePassword(password);
+const viewOrHidePasswordInputIcon = document.querySelector('#viewOrHidePasswordInputIcon');
+viewOrHidePasswordInputIcon.addEventListener('click', function(){
+    viewOrHidePassword(passwordInput, viewOrHidePasswordInputIcon);
 });
 
-const warningPassword = document.querySelector('#warningPassword');
+const changePasswordButton = document.querySelector('#changePasswordButton');
+changePasswordButton.addEventListener('click', function(){
+    let password = passwordInput.value.trim();
+    validatePasswordFormat(password);
+});
 
+const passwordMessage = document.querySelector('#passwordMessage');
 
-if (token.length == 40 && /^[a-zA-Z0-9]+$/.test(token)) {
-    verifyUserForgotPasswordToken(token);
+if (forgotPasswordToken.length == 40 && /^[a-zA-Z0-9]+$/.test(forgotPasswordToken)) {
+    checkIfForgotPasswordTokenExistsInDatabase(forgotPasswordToken);
 }
 
-/**
-    * Verifica o token de alteração de senha do usuário.
+
+/*
+    * Verifica se o token de esqueci minha senha informado existe ou não no banco de dados.
     *
     * @function
-    * @param {String} tokne - Token de recuperação de senha enviado para o usuário.
-    * @description 
-    * - Se o token for válido, exibe o formulário de alteração de senha.
-    * - Se o token for inválido, exibe uma mensagem de erro.
-    * - Caso ocorra um erro durante o processo de validação, exibe uma mensagem informando sobre o erro.
+    * @param {String} forgotPasswordToken - Token de esqueci minha senha do usuário.
     * @author isaquesv
     * @since 1.0
 */
-function verifyUserForgotPasswordToken(token) {
+function checkIfForgotPasswordTokenExistsInDatabase(forgotPasswordToken) {
     $.ajax({
         method: 'POST',
-        url: 'VerifyUserForgotPasswordTokenServlet',
+        url: 'CheckIfForgotPasswordTokenExistsInDatabaseServlet',
         data: {
-            token: token
+            forgotPasswordToken: forgotPasswordToken
         },
         dataType: 'json',
-        success: function (tokenForgotPasswordResponseJSON) {
-            if (tokenForgotPasswordResponseJSON.isTokenValid) {
-                divErrorMessage.classList.add('d-none');
-                divChangePassword.classList.remove('d-none');
-                inputPassword.focus();
+        success: function (forgotPasswordTokenExistenceResponse) {
+            if (forgotPasswordTokenExistenceResponse.isForgotPasswordTokenExistsInDatabase == true) {
+                showOrHideChangePasswordForm(true);
+                passwordInput.focus();
             } else {
-                errorMessage.innerHTML = tokenForgotPasswordResponseJSON.message;
+                showOrHideChangePasswordForm(false);
+                invalidTokenMessage.innerHTML = forgotPasswordTokenExistenceResponse.message;
             }
         },
         error: function (xhr, status, error) {
             console.log("Erro: " + error);
-            document.body.innerHTML = "Houve um erro ao verificar o token. Tente novamente.";
+            showOrHideChangePasswordForm(false);
+            invalidTokenMessage.innerHTML = "Houve um erro ao verificar o token. Tente novamente.";
         }
     });
 }
 
-/**
-    * Verifica se a senha informada é ou não válida.
+/*
+    * Verifica se a nova senha informada é válida ou não.
     *
     * @function
-    * @param {String} password - Senha informada pelo usuário.
-    * @returns {Boolean} O resultado da validação indicando se a senha informada é ou não válida.
-    * @description 
-    * - Caso a senha esteja vazia, exibe: "Por favor, insira uma senha."
-    * - Caso a senha tenha menos de 8 caracteres, exibe: "A senha deve ter pelo menos 8 caracteres."
-    * - Caso a senha não tenha ao menos 1 letra, exibe: "A senha deve ter pelo menos 1 letra."
-    * - Caso a senha não tenha ao menos 1 número, exibe: "A senha deve ter pelo menos 1 número."
-    * - Caso a senha não tenha ao menos 1 número, exibe: "A senha deve ter pelo menos 1 caractere especial."
-    * - Caso a senha seja válida, limpa qualquer mensagem anterior.
+    * @param {String} password - Nova senha do usuário.
     * @author isaquesv
     * @since 1.0
 */
-function validatePassword(password) {
+function validatePasswordFormat(password) {
     if (password.length === 0) {
-        warningPassword.innerHTML = "Por favor, insira uma senha.";
+        passwordMessage.innerHTML = "Por favor, insira uma senha.";
     } else if (password.length < 8) {
-        warningPassword.innerHTML = "A senha deve ter pelo menos 8 caracteres.";
+        passwordMessage.innerHTML = "A senha deve ter pelo menos 8 caracteres.";
     } else {
         // Expressão regular para encontrar qualquer letra (maiúscula ou minúscula)
         const regexLetter = /[a-zA-Z]/;
@@ -93,85 +91,107 @@ function validatePassword(password) {
         const regexSpecialCharacter = /[^a-zA-Z0-9]/;
         
         if (!regexLetter.test(password)) {
-            warningPassword.innerHTML = "A senha deve ter pelo menos 1 letra.";
+            passwordMessage.innerHTML = "A senha deve ter pelo menos 1 letra.";
         }
         if (!regexNumber.test(password)) {
-            warningPassword.innerHTML = "A senha deve ter pelo menos 1 número.";
+            passwordMessage.innerHTML = "A senha deve ter pelo menos 1 número.";
         }
         if (!regexSpecialCharacter.test(password)) {
-            warningPassword.innerHTML = "A senha deve ter pelo menos 1 caractere especial.";
+            passwordMessage.innerHTML = "A senha deve ter pelo menos 1 caractere especial.";
         }
         
-        if (regexLetter.test(password) && regexNumber.test(password) && regexSpecialCharacter.test(password)) {
-            warningPassword.innerHTML = ""; 
-            changeUserPassword(token, password);
+        if (regexLetter.test(password) == true && regexNumber.test(password) == true && regexSpecialCharacter.test(password) == true) {
+            passwordMessage.innerHTML = ""; 
+            changePassword(forgotPasswordToken, password);
         }
     }
 }
 
-/**
-    * Altera a senha do usuário com base no token fornecido.
+/*
+    * Altera a senha do usuário.
     *
     * @function
-    * @param {String} token - Token de recuperação de senha enviado para o usuário.
-    * @param {String} password - Nova senha fornecida pelo usuário.
-    * @description 
-    * - Se a alteração da senha for bem-sucedida, redireciona o usuário para a página inicial.
-    * - Se a alteração falhar, exibe uma mensagem de erro com a descrição do problema.
-    * - Em caso de erro inesperado durante o processo, exibe uma mensagem informando sobre a falha na alteração da senha.
+    * @param {String} forgotPasswordToken - Token de esqueci minha senha do usuário.
+    * @param {String} password - Nova senha do usuário.
     * @author isaquesv
     * @since 1.0
 */
-function changeUserPassword(token, password) {
+function changePassword(forgotPasswordToken, password) {
     $.ajax({
         method: 'POST',
-        url: 'ChangeUserPassword',
+        url: 'ChangePasswordServlet',
         data: {
-            token: token,
+            forgotPasswordToken: forgotPasswordToken,
             password: password
         },
         dataType: 'json',
-        success: function (passwordChangeResultJSON) {
-            if (passwordChangeResultJSON.isPasswordChanged) {
+        success: function (changePasswordResponse) {
+            if (changePasswordResponse.isPasswordChanged == true) {
                 window.location.href = "home.jsp";
             } else {
-                warningPassword.innerHTML = passwordChangeResultJSON.message;
+                passwordMessage.innerHTML = changePasswordResponse.message;
             }
         },
         error: function (xhr, status, error) {
             console.log("Erro: " + error);
-            warningPassword.innerHTML = "Houve um erro ao tentar alterar sua senha. Tente novamente.";
+            passwordMessage.innerHTML = "Houve um erro ao tentar alterar sua senha. Tente novamente.";
         }
     });
 }
 
-/**
-    * Exibe ou não o valor do campo senha.
+/*
+    * Exibe ou esconde o valor do campo senha.
     *
     * @function
-    * @param {Element} elementInputPassword - Campo senha que deve ter o seu atributo "type" alterado.
-    * @param {Element} elementIconPassword - Ícone senha que deve ter a sua classe alterada.
+    * @param {Element} passwordInput - Elemento INPUT da senha.
+    * @param {Element} viewOrHidePasswordInputIcon - Elemento I, olho, da senha.
     * @author isaquesv
     * @since 1.0
 */
-function viewOrHidePassword(elementInputPassword, elementIconPassword) {
-    if (elementInputPassword.type == 'password') {
-        elementInputPassword.type = 'text';
+function viewOrHidePassword(passwordInput, viewOrHidePasswordInputIcon) {
+    if (passwordInput.type == 'password') {
+        passwordInput.type = 'text';
         
-        if (!elementIconPassword.classList.contains('bi-eye-slash')) {
-            elementIconPassword.classList.add('bi-eye-slash');
+        if (!viewOrHidePasswordInputIcon.classList.contains('bi-eye-slash')) {
+            viewOrHidePasswordInputIcon.classList.add('bi-eye-slash');
         }
-        if (elementIconPassword.classList.contains('bi-eye')) {
-            elementIconPassword.classList.remove('bi-eye');
+        if (viewOrHidePasswordInputIcon.classList.contains('bi-eye')) {
+            viewOrHidePasswordInputIcon.classList.remove('bi-eye');
         }
     } else {
-        elementInputPassword.type = 'password';
+        passwordInput.type = 'password';
         
-        if (!elementIconPassword.classList.contains('bi-eye')) {
-            elementIconPassword.classList.add('bi-eye');
+        if (!viewOrHidePasswordInputIcon.classList.contains('bi-eye')) {
+            viewOrHidePasswordInputIcon.classList.add('bi-eye');
         }
-        if (elementIconPassword.classList.contains('bi-eye-slash')) {
-            elementIconPassword.classList.remove('bi-eye-slash');
+        if (viewOrHidePasswordInputIcon.classList.contains('bi-eye-slash')) {
+            viewOrHidePasswordInputIcon.classList.remove('bi-eye-slash');
+        }
+    }
+}
+
+/*
+    * Exibe ou esconde o formulário de alteração de senha do usuário.
+    *
+    * @function
+    * @param {Boolean} isToShow - Para saber se é para exibir o formulário de alteração de senha do usuário ou não.
+    * @author isaquesv
+    * @since 1.0
+*/
+function showOrHideChangePasswordForm(isToShow) {
+    if (isToShow == true) {
+        if (invalidTokenContainer.classList.contains('d-none') == false) {
+            invalidTokenContainer.classList.add('d-none');
+        }
+        if (changePasswordContainer.classList.contains('d-none') == true) {
+            changePasswordContainer.classList.remove('d-none');
+        }
+    } else {    
+        if (invalidTokenContainer.classList.contains('d-none') == true) {
+            invalidTokenContainer.classList.remove('d-none');
+        }
+        if (changePasswordContainer.classList.contains('d-none') == false) {
+            changePasswordContainer.classList.add('d-none');
         }
     }
 }
