@@ -82,7 +82,7 @@ public class ForgotPasswordEmailManager {
                         "name": "Prezado(a) %s"
                     }
                 ],
-                "subject": "UAP - Confirmação de Cadastro",
+                "subject": "UAP - Solicitação de Alteração de Senha",
                 "htmlContent": "%s"
             }
         """, API_EMAIL, API_NAME, email, name, emailHTMLBody);
