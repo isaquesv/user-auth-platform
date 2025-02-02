@@ -55,4 +55,4 @@ https://github.com/user-attachments/assets/7fa9372c-5a14-404f-9768-0e8d3f89a565
 
 # ☕ Demonstração do funcionamento
 
-https://github.com/user-attachments/assets/42d22ec3-6637-49a8-9e25-558ec23ef4cd
+https://github.com/user-attachments/assets/0da5b3da-22e8-4d96-987e-838e60ce4aab
