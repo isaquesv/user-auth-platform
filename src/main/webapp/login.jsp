@@ -44,9 +44,9 @@
                 <p class="text-center">Esqueceu sua senha? <a href='forgot-password.jsp'>Clique aqui</a>.</p>
                 <p class="text-center">Ainda não possui uma conta? <a href='register.jsp'>Cadastre-se</a>.</p>
             </div>
-            
-            <%@include file="WEB-INF/JSPF/html-body-libs.jspf"%>
-            <script src="js/login.js"></script>
         </main>
+
+        <%@include file="WEB-INF/JSPF/html-body-libs.jspf"%>
+        <script src="js/login.js"></script>
     </body>
 </html>
