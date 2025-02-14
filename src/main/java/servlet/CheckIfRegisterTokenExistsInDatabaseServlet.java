@@ -25,40 +25,40 @@ public class CheckIfRegisterTokenExistsInDatabaseServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         
         String registerToken = request.getParameter("registerToken");
-        JSONObject registerTokenExistenceResponse = new JSONObject();
+        JSONObject registerTokenExistenceJsonResponse = new JSONObject();
         
         try {
             if (registerToken == null || registerToken.trim().isEmpty()) {
-                registerTokenExistenceResponse.put("isRegisterTokenExistsInDatabase", false);
-                registerTokenExistenceResponse.put("message", "Houve um erro inesperado ao enviar o parâmetro (token). Tente novamente.");
+                registerTokenExistenceJsonResponse.put("isRegisterTokenInDatabase", false);
+                registerTokenExistenceJsonResponse.put("message", "Houve um erro inesperado ao enviar o parâmetro (token). Tente novamente.");
             } else {
                 RegisterToken.createRegisterTokenTable();
                 // Verificando se o token de cadastro de usuário existe no banco de dados e se é válido
-                registerTokenExistenceResponse = RegisterToken.getRegisterToken(registerToken);
+                registerTokenExistenceJsonResponse = RegisterToken.getRegisterToken(registerToken);
                 
-                if (registerTokenExistenceResponse.getBoolean("isRegisterTokenExistsInDatabase")) {
+                if (registerTokenExistenceJsonResponse.getBoolean("isRegisterTokenInDatabase")) {
                     User.createUserTable();
                     
-                    String name = registerTokenExistenceResponse.getString("name");
-                    String email = registerTokenExistenceResponse.getString("email");
-                    String password = registerTokenExistenceResponse.getString("password");
+                    String name = registerTokenExistenceJsonResponse.getString("name");
+                    String email = registerTokenExistenceJsonResponse.getString("email");
+                    String password = registerTokenExistenceJsonResponse.getString("password");
                     boolean isUserRegistered = User.addUser(name, email, password);
                     
                     if (isUserRegistered) {
                         // Iniciando uma sessão com os dados do usuário, caso o token de cadastro exista no banco de dados e seja válido
                         HttpSession loginSession = request.getSession();
                         loginSession.setAttribute("isUserLoggedIn", true);
-                        loginSession.setAttribute("name", registerTokenExistenceResponse.getString("name"));
-                        loginSession.setAttribute("email", registerTokenExistenceResponse.getString("email"));
+                        loginSession.setAttribute("name", registerTokenExistenceJsonResponse.getString("name"));
+                        loginSession.setAttribute("email", registerTokenExistenceJsonResponse.getString("email"));
                     }
                 }
             }
         } catch (Exception ex) {
-            registerTokenExistenceResponse.put("isRegisterTokenExistsInDatabase", false);
-            registerTokenExistenceResponse.put("message", "Erro inesperado: " + ex.getMessage());
+            registerTokenExistenceJsonResponse.put("isRegisterTokenInDatabase", false);
+            registerTokenExistenceJsonResponse.put("message", "Erro inesperado: " + ex.getMessage());
         }
         
-        response.getWriter().write(registerTokenExistenceResponse.toString());
+        response.getWriter().write(registerTokenExistenceJsonResponse.toString());
     }
 
     @Override

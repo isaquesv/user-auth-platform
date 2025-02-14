@@ -46,9 +46,9 @@ async function validateEmailFormat(email) {
         emailMessage.innerHTML = "Por favor, insira um e-mail válido.";
     } else {
         emailMessage.innerHTML = "";
-        let isEmailExistsInDatabase = await checkIfEmailExistsInDatabase(email);
+        let isEmailInDatabase = await checkIfEmailExistsInDatabase(email);
 
-        if (isEmailExistsInDatabase == false) {
+        if (isEmailInDatabase == true) {
             sendForgotPasswordEmail(false, email);
         }
     }
@@ -65,7 +65,7 @@ async function validateEmailFormat(email) {
 */
 async function checkIfEmailExistsInDatabase(email) {
     try {
-        const emailExistenceResponse = await new Promise((resolve, reject) => {
+        const emailExistenceJsonResponse = await new Promise((resolve, reject) => {
             $.ajax({
                 method: 'POST',
                 url: 'CheckIfEmailExistsInDatabaseServlet',
@@ -82,13 +82,13 @@ async function checkIfEmailExistsInDatabase(email) {
             });
         });
         
-        if (emailExistenceResponse.isEmailExistsInDatabase == true) {
-            emailMessage.innerHTML = emailExistenceResponse.message;
+        if (emailExistenceJsonResponse.isEmailInDatabase == false) {
+            emailMessage.innerHTML = emailExistenceJsonResponse.message;
         } else {
             emailMessage.innerHTML = "";
         }
         
-        return emailExistenceResponse.isEmailExistsInDatabase;
+        return emailExistenceJsonResponse.isEmailInDatabase;
     } catch (error) {
         console.log("Erro: " + error.message);
         emailMessage.innerHTML = "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente.";
@@ -113,21 +113,21 @@ function sendForgotPasswordEmail(isForgotPasswordEmailResent, email) {
             email: email
         },
         dataType: 'json',
-        success: function (forgotPasswordEmailResponse) {
-            if (forgotPasswordEmailResponse.isForgotPasswordEmailSent == true) {
+        success: function (forgotPasswordEmailJsonResponse) {
+            if (forgotPasswordEmailJsonResponse.isForgotPasswordEmailSent == true) {
                 showOrHideForgotPasswordForm(true);
                 emailMessage.innerHTML = "";
                 
                 if (isForgotPasswordEmailResent == true) {
-                    forgotPasswordResponseMessage.innerHTML = "<b>E-mail reenviado</b>. " + forgotPasswordEmailResponse.message;
+                    forgotPasswordResponseMessage.innerHTML = "<b>E-mail reenviado</b>. " + forgotPasswordEmailJsonResponse.message;
                 } else {
-                    forgotPasswordResponseMessage.innerHTML = forgotPasswordEmailResponse.message;
+                    forgotPasswordResponseMessage.innerHTML = forgotPasswordEmailJsonResponse.message;
                 }
             } else {
                 showOrHideForgotPasswordForm(false);
                 
                 forgotPasswordResponseMessage.innerHTML = "";
-                emailMessage.innerHTML = forgotPasswordEmailResponse.message;
+                emailMessage.innerHTML = forgotPasswordEmailJsonResponse.message;
             }
         },
         error: function (xhr, status, error) {

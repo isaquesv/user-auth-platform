@@ -65,7 +65,7 @@ function validateEmailFormat(email) {
 */
 async function checkIfEmailExistsInDatabase(email) {
     try {
-        const emailExistenceResponse = await new Promise((resolve, reject) => {
+        const emailExistenceJsonResponse = await new Promise((resolve, reject) => {
             $.ajax({
                 method: 'POST',
                 url: 'CheckIfEmailExistsInDatabaseServlet',
@@ -82,13 +82,13 @@ async function checkIfEmailExistsInDatabase(email) {
             });
         });
         
-        if (emailExistenceResponse.isEmailExistsInDatabase == true) {
-            emailMessage.innerHTML = emailExistenceResponse.message;
+        if (emailExistenceJsonResponse.isEmailInDatabase == false) {
+            emailMessage.innerHTML = emailExistenceJsonResponse.message;
         } else {
             emailMessage.innerHTML = "";
         }
         
-        return emailExistenceResponse.isEmailExistsInDatabase;
+        return emailExistenceJsonResponse.isEmailInDatabase;
     } catch (error) {
         console.log("Erro: " + error.message);
         emailMessage.innerHTML = "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente.";
@@ -130,14 +130,14 @@ async function validateLoginForm() {
     let password = passwordInput.value.trim();
     
     let isEmailValid = validateEmailFormat(email);
-    let isEmailAvailable = false;
+    let isEmailInDatabase;
     let isPasswordValid  = validatePasswordFormat(password);
     
     if (isEmailValid) {
-        isEmailAvailable = await checkIfEmailExistsInDatabase(email);
+        isEmailInDatabase = await checkIfEmailExistsInDatabase(email);
     }
     
-    if (isEmailValid && !isEmailAvailable && isPasswordValid) {
+    if (isEmailValid == true && isEmailInDatabase == true && isPasswordValid == true) {
         verifyLogin(email, password);
     }
 }
@@ -160,13 +160,13 @@ function verifyLogin(email, password) {
             password: password
         },
         dataType: 'json',
-        success: function (loginVerificationResponse) {
-            if (loginVerificationResponse.isLoginCorrect == true) {
+        success: function (loginVerificationJsonResponse) {
+            if (loginVerificationJsonResponse.isLoginValid == true) {
                 disableLoginInputs();
                 
                 window.location.href = "home.jsp";
             } else {
-                emailMessage.innerHTML = loginVerificationResponse.message;
+                emailMessage.innerHTML = loginVerificationJsonResponse.message;
             }
         },
         error: function (xhr, status, error) {

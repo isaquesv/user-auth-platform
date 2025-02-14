@@ -137,7 +137,7 @@ function validateEmailFormat(email) {
 */
 async function checkIfEmailExistsInDatabase(email) {
     try {
-        const emailExistenceResponse = await new Promise((resolve, reject) => {
+        const emailExistenceJsonResponse = await new Promise((resolve, reject) => {
             $.ajax({
                 method: 'POST',
                 url: 'CheckIfEmailExistsInDatabaseServlet',
@@ -154,13 +154,13 @@ async function checkIfEmailExistsInDatabase(email) {
             });
         });
 
-        if (emailExistenceResponse.isEmailExistsInDatabase == true) {
+        if (emailExistenceJsonResponse.isEmailInDatabase == false) {
             emailMessage.innerHTML = "";
         } else {
-            emailMessage.innerHTML = emailExistenceResponse.message;           
+            emailMessage.innerHTML = emailExistenceJsonResponse.message;           
         }
         
-        return emailExistenceResponse.isEmailExistsInDatabase;
+        return emailExistenceJsonResponse.isEmailInDatabase;
     } catch (error) {
         console.log("Erro: " + error.message);
         emailMessage.innerHTML = "Houve um erro ao verificar se este e-mail já está, ou não, cadastrado em nosso sistema. Tente novamente.";
@@ -251,15 +251,15 @@ async function validateRegisterForm() {
     
     let isNameValid = validateNameFormat(name);
     let isEmailValid = validateEmailFormat(email);
-    let isEmailAvailable = false;
+    let isEmailInDatabase;
     let isPasswordValid  = validatePasswordFormat(password);
     let isConfirmPasswordValid = validateConfirmPasswordFormat(confirmPassword, password);
     
     if (isEmailValid == true) {
-        isEmailAvailable = await checkIfEmailExistsInDatabase(email);
+        isEmailInDatabase = await checkIfEmailExistsInDatabase(email);
     }
     
-    if (isNameValid == true && isEmailAvailable == true && isPasswordValid == true && isConfirmPasswordValid == true) {
+    if (isNameValid == true && isEmailInDatabase == false && isPasswordValid == true && isConfirmPasswordValid == true) {
         let user = {
             name: name,
             email: email,
@@ -291,14 +291,14 @@ function sendRegisterEmail(isRegisterEmailResent, user) {
             password: user.password
         },
         dataType: 'json',
-        success: function (registerEmailResponse) {
-            if (registerEmailResponse.isRegisterEmailSent == true) {
+        success: function (registerEmailJsonResponse) {            
+            if (registerEmailJsonResponse.isRegisterEmailSent == true) {
                 showOrHideRegisterForm(false);
                 
                 if (isRegisterEmailResent == true) {
-                    registerEmailVerificationRequiredMessage.innerHTML = "<b>E-mail reenviado</b>. " + registerEmailResponse.message;
+                    registerEmailVerificationRequiredMessage.innerHTML = "<b>E-mail reenviado</b>. " + registerEmailJsonResponse.message;
                 } else {
-                    registerEmailVerificationRequiredMessage.innerHTML = registerEmailResponse.message;
+                    registerEmailVerificationRequiredMessage.innerHTML = registerEmailJsonResponse.message;
                 }
                 
                 confirmPasswordMessage.innerHTML = "";
@@ -306,7 +306,7 @@ function sendRegisterEmail(isRegisterEmailResent, user) {
                 enableOrDisableRegisterForm(true);
                 showOrHideRegisterForm(true);
                 registerEmailVerificationRequiredMessage.innerHTML = "";
-                confirmPasswordMessage.innerHTML = registerEmailResponse.message;
+                confirmPasswordMessage.innerHTML = registerEmailJsonResponse.message;
             }
         },
         error: function (xhr, status, error) {

@@ -26,19 +26,19 @@ public class VerifyLoginServlet extends HttpServlet {
         
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        JSONObject loginVerificationResponse = new JSONObject();
+        JSONObject loginVerificationJsonResponse = new JSONObject();
         
         try {
             if ((email == null || email.trim().isEmpty()) || password == null || password.trim().isEmpty()) {
-                loginVerificationResponse.put("isLoginCorrect", false);
-                loginVerificationResponse.put("message", "Houve um erro inesperado ao enviar os parâmetros (e-mail, senha). Tente novamente.");
+                loginVerificationJsonResponse.put("isLoginValid", false);
+                loginVerificationJsonResponse.put("message", "Houve um erro inesperado ao enviar os parâmetros (e-mail, senha). Tente novamente.");
             } else {
                 User.createUserTable();
                 // Verificando se o login é válido
-                loginVerificationResponse = User.getUser(email, password);
+                loginVerificationJsonResponse = User.getUser(email, password);
                 
-                if (loginVerificationResponse.getBoolean("isLoginCorrect")) {
-                    String name = loginVerificationResponse.getString("name");
+                if (loginVerificationJsonResponse.getBoolean("isLoginValid")) {
+                    String name = loginVerificationJsonResponse.getString("name");
                     
                     // Iniciando uma sessão com os dados do usuário, caso o login seja válido
                     HttpSession loginSession = request.getSession();
@@ -48,11 +48,11 @@ public class VerifyLoginServlet extends HttpServlet {
                 }
             }
         } catch (Exception ex) {
-            loginVerificationResponse.put("isLoginCorrect", false);
-            loginVerificationResponse.put("message", "Erro inesperado: " + ex.getMessage());
+            loginVerificationJsonResponse.put("isLoginValid", false);
+            loginVerificationJsonResponse.put("message", "Erro inesperado: " + ex.getMessage());
         }
         
-        response.getWriter().write(loginVerificationResponse.toString());
+        response.getWriter().write(loginVerificationJsonResponse.toString());
     }
 
     @Override

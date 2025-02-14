@@ -23,23 +23,23 @@ public class CheckIfEmailExistsInDatabaseServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         
         String email = request.getParameter("email");
-        JSONObject emailExistenceResponse = new JSONObject();
+        JSONObject emailExistenceJsonResponse = new JSONObject();
         
         try {
             if (email == null || email.trim().isEmpty()) {
-                emailExistenceResponse.put("isEmailExistsInDatabase", false);
-                emailExistenceResponse.put("message", "Houve um erro inesperado ao enviar o parâmetro (e-mail). Tente novamente.");
+                emailExistenceJsonResponse.put("isEmailInDatabase", false);
+                emailExistenceJsonResponse.put("message", "Houve um erro inesperado ao enviar o parâmetro (e-mail). Tente novamente.");
             } else {
                 User.createUserTable();
                 // Verificando se o e-mail esta cadastrado no banco de dados
-                emailExistenceResponse = User.getEmailByUser(email);
+                emailExistenceJsonResponse = User.getEmailByUser(email);
             }
         } catch (Exception ex) {
-            emailExistenceResponse.put("isEmailExistsInDatabase", false);
-            emailExistenceResponse.put("message", "Erro inesperado: " + ex.getMessage());
+            emailExistenceJsonResponse.put("isEmailInDatabase", false);
+            emailExistenceJsonResponse.put("message", "Erro inesperado: " + ex.getMessage());
         }
         
-        response.getWriter().write(emailExistenceResponse.toString());
+        response.getWriter().write(emailExistenceJsonResponse.toString());
     }
 
     @Override

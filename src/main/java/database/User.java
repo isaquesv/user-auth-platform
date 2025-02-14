@@ -43,7 +43,7 @@ public class User {
         * @author              isaquesv
     */
     public static JSONObject getUser(String email, String password) throws Exception {
-        JSONObject loginVerificationResponse = new JSONObject();
+        JSONObject loginVerificationJsonResponse = new JSONObject();
         
         try {
             Connection databaseConnection = DatabaseConnection.getConnection();
@@ -60,16 +60,16 @@ public class User {
                 boolean arePasswordsEqual = HashUtil.checkHash(password, storedHash);
                 
                 if (arePasswordsEqual == true) {
-                    loginVerificationResponse.put("isLoginCorrect", true);
-                    loginVerificationResponse.put("message", "O login foi realizado com sucesso.");
-                    loginVerificationResponse.put("name", name);
+                    loginVerificationJsonResponse.put("isLoginValid", true);
+                    loginVerificationJsonResponse.put("message", "O login foi realizado com sucesso.");
+                    loginVerificationJsonResponse.put("name", name);
                 } else {
-                    loginVerificationResponse.put("isLoginCorrect", false);
-                    loginVerificationResponse.put("message", "O e-mail e a senha declarados não conferem.");
+                    loginVerificationJsonResponse.put("isLoginValid", false);
+                    loginVerificationJsonResponse.put("message", "O e-mail e a senha declarados não conferem.");
                 }
             } else {
-                loginVerificationResponse.put("isLoginCorrect", false);
-                loginVerificationResponse.put("message", "O e-mail e a senha declarados não conferem.");
+                loginVerificationJsonResponse.put("isLoginValid", false);
+                loginVerificationJsonResponse.put("message", "O e-mail e a senha declarados não conferem.");
             }
 
             result.close();
@@ -80,7 +80,7 @@ public class User {
             System.err.println(e.getMessage());
         }
         
-        return loginVerificationResponse;
+        return loginVerificationJsonResponse;
     }
     
     /**
@@ -91,7 +91,7 @@ public class User {
         * @author              isaquesv
     */
     public static JSONObject getEmailByUser(String email) throws SQLException {
-        JSONObject emailExistenceResponse = new JSONObject();
+        JSONObject emailExistenceJsonResponse = new JSONObject();
         
         try {
             Connection databaseConnection = DatabaseConnection.getConnection();
@@ -102,11 +102,11 @@ public class User {
 
             ResultSet result = pStmt.executeQuery();
             if (result.next()) {
-                emailExistenceResponse.put("isEmailExistsInDatabase", false);
-                emailExistenceResponse.put("message", "Este e-mail já esta em uso. Tente outro.");
+                emailExistenceJsonResponse.put("isEmailInDatabase", true);
+                emailExistenceJsonResponse.put("message", "Este e-mail já esta em uso. Tente outro.");
             } else {
-                emailExistenceResponse.put("isEmailExistsInDatabase", true);
-                emailExistenceResponse.put("message", "Este e-mail não foi cadastrado.");
+                emailExistenceJsonResponse.put("isEmailInDatabase", false);
+                emailExistenceJsonResponse.put("message", "Este e-mail não foi cadastrado.");
             }
 
             result.close();
@@ -116,7 +116,7 @@ public class User {
             System.err.println(e.getMessage());
         }
         
-        return emailExistenceResponse;
+        return emailExistenceJsonResponse;
     }
     
     /**
@@ -195,7 +195,7 @@ public class User {
         * @author              isaquesv
     */
     public static JSONObject setPassword(String email, String password) {
-        JSONObject changePasswordResponse = new JSONObject();
+        JSONObject changePasswordJsonResponse = new JSONObject();
         
         try {
             Connection databaseConnection = DatabaseConnection.getConnection();
@@ -212,11 +212,11 @@ public class User {
             
             int result = pStmt.executeUpdate(); 
             if (result == 1) {
-                changePasswordResponse.put("isPasswordChanged", true);
-                changePasswordResponse.put("message", "Senha alterada com sucesso");
+                changePasswordJsonResponse.put("isPasswordChanged", true);
+                changePasswordJsonResponse.put("message", "Senha alterada com sucesso");
             } else {
-                changePasswordResponse.put("isPasswordChanged", false);
-                changePasswordResponse.put("message", "Falha ao tentar alterar a senha");
+                changePasswordJsonResponse.put("isPasswordChanged", false);
+                changePasswordJsonResponse.put("message", "Falha ao tentar alterar a senha");
             }
             
             pStmt.close();
@@ -225,6 +225,6 @@ public class User {
             System.err.println(e.getMessage());
         }
         
-        return changePasswordResponse;
+        return changePasswordJsonResponse;
     }
 }

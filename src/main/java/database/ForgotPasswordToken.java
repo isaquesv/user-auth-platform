@@ -45,7 +45,7 @@ public class ForgotPasswordToken {
         * @author                       isaquesv
     */
     public static JSONObject getForgotPasswordToken(String forgotPasswordToken) throws Exception {
-        JSONObject forgotPasswordTokenExistenceResponse = new JSONObject();
+        JSONObject forgotPasswordTokenExistenceJsonResponse = new JSONObject();
         
         try {
             Connection databaseConnection = DatabaseConnection.getConnection();
@@ -66,15 +66,15 @@ public class ForgotPasswordToken {
                 if (expiresAt.isAfter(LocalDateTime.now()) && tokenDatabase.equals(forgotPasswordToken)) {
                     setForgotPasswordTokenStatus(forgotPasswordToken);
                     
-                    forgotPasswordTokenExistenceResponse.put("isForgotPasswordTokenExistsInDatabase", true);
-                    forgotPasswordTokenExistenceResponse.put("message", "Token validado com sucesso!");
+                    forgotPasswordTokenExistenceJsonResponse.put("isForgotPasswordTokenExistsInDatabase", true);
+                    forgotPasswordTokenExistenceJsonResponse.put("message", "Token validado com sucesso!");
                 } else {
-                    forgotPasswordTokenExistenceResponse.put("isForgotPasswordTokenExistsInDatabase", false);
-                    forgotPasswordTokenExistenceResponse.put("message", "Sentimos muito! Este link de recuperação de senha está expirado. Por favor, solicite o envio de outro e-mail para alterar sua senha. Se precisar de ajuda, entre em contato com o suporte: <a href='https://github.com/isaquesv/user-auth-platform/issues'>clique aqui</a>.");
+                    forgotPasswordTokenExistenceJsonResponse.put("isForgotPasswordTokenExistsInDatabase", false);
+                    forgotPasswordTokenExistenceJsonResponse.put("message", "Sentimos muito! Este link de recuperação de senha está expirado. Por favor, solicite o envio de outro e-mail para alterar sua senha. Se precisar de ajuda, entre em contato com o suporte: <a href='https://github.com/isaquesv/user-auth-platform/issues'>clique aqui</a>.");
                 }
             } else {
-                forgotPasswordTokenExistenceResponse.put("isForgotPasswordTokenExistsInDatabase", false);
-                forgotPasswordTokenExistenceResponse.put("message", "Sentimos muito! Este link de recuperação de senha está incorreto ou expirado. Por favor, solicite o envio de outro e-mail para alterar sua senha. Se precisar de ajuda, entre em contato com o suporte: <a href='https://github.com/isaquesv/user-auth-platform/issues'>clique aqui</a>.");
+                forgotPasswordTokenExistenceJsonResponse.put("isForgotPasswordTokenExistsInDatabase", false);
+                forgotPasswordTokenExistenceJsonResponse.put("message", "Sentimos muito! Este link de recuperação de senha está incorreto ou expirado. Por favor, solicite o envio de outro e-mail para alterar sua senha. Se precisar de ajuda, entre em contato com o suporte: <a href='https://github.com/isaquesv/user-auth-platform/issues'>clique aqui</a>.");
             }
 
             result.close();
@@ -84,7 +84,7 @@ public class ForgotPasswordToken {
             System.err.println(e.getMessage());
         }
         
-        return forgotPasswordTokenExistenceResponse;
+        return forgotPasswordTokenExistenceJsonResponse;
     }
     
     /**

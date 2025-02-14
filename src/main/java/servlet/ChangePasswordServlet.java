@@ -26,12 +26,12 @@ public class ChangePasswordServlet extends HttpServlet {
         
         String forgotPasswordToken = request.getParameter("forgotPasswordToken");
         String password = request.getParameter("password");
-        JSONObject changePasswordResponse = new JSONObject();
+        JSONObject changePasswordJsonResponse = new JSONObject();
         
         try {
             if ((forgotPasswordToken == null || forgotPasswordToken.trim().isEmpty()) || password == null || password.trim().isEmpty()) {
-                changePasswordResponse.put("isPasswordChanged", false);
-                changePasswordResponse.put("message", "Houve um erro inesperado ao enviar os parâmetros (token, senha). Tente novamente.");
+                changePasswordJsonResponse.put("isPasswordChanged", false);
+                changePasswordJsonResponse.put("message", "Houve um erro inesperado ao enviar os parâmetros (token, senha). Tente novamente.");
             } else {
                 User.createUserTable(); 
                 // Capturando o nome e e-mail do usuário com base em seu token de alteração de senha
@@ -41,24 +41,24 @@ public class ChangePasswordServlet extends HttpServlet {
                     String name = user.getString("nameAssociatedWithToken");
                     String email = user.getString("emailAssociatedWithToken");
                     // Alterando a senha do usuário
-                    changePasswordResponse = User.setPassword(email, password);
+                    changePasswordJsonResponse = User.setPassword(email, password);
                     
                     HttpSession loginSession = request.getSession();
                     loginSession.setAttribute("isUserLoggedIn", true);
                     loginSession.setAttribute("name", name);
                     loginSession.setAttribute("email", email);
                 } else {
-                    changePasswordResponse.put("isPasswordChanged", false);
-                    changePasswordResponse.put("message", "Houve um erro inesperado ao tentar capturar seu e-mail. Tente novamente.");
+                    changePasswordJsonResponse.put("isPasswordChanged", false);
+                    changePasswordJsonResponse.put("message", "Houve um erro inesperado ao tentar capturar seu e-mail. Tente novamente.");
                 }
                 
             }
         } catch (Exception ex) {
-            changePasswordResponse.put("isPasswordChanged", false);
-            changePasswordResponse.put("message", "Erro inesperado: " + ex.getMessage());
+            changePasswordJsonResponse.put("isPasswordChanged", false);
+            changePasswordJsonResponse.put("message", "Erro inesperado: " + ex.getMessage());
         }
         
-        response.getWriter().write(changePasswordResponse.toString());
+        response.getWriter().write(changePasswordJsonResponse.toString());
     }
 
     @Override

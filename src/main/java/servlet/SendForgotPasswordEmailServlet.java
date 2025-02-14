@@ -26,12 +26,12 @@ public class SendForgotPasswordEmailServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         
         String email = request.getParameter("email");
-        JSONObject forgotPasswordEmailResponse = new JSONObject();
+        JSONObject forgotPasswordEmailJsonResponse = new JSONObject();
         
         try {
             if (email == null || email.trim().isEmpty()) {
-                forgotPasswordEmailResponse.put("isForgotPasswordEmailSent", false);
-                forgotPasswordEmailResponse.put("message", "Houve um erro inesperado ao enviar o parâmetro (e-mail). Tente novamente.");
+                forgotPasswordEmailJsonResponse.put("isForgotPasswordEmailSent", false);
+                forgotPasswordEmailJsonResponse.put("message", "Houve um erro inesperado ao enviar o parâmetro (e-mail). Tente novamente.");
             } else {
                 ForgotPasswordToken.createForgotPasswordTokenTable();
                 // Capturando o nome do usuário, com base no seu e-mail, e gerando um token de esqueci minha senha
@@ -41,18 +41,18 @@ public class SendForgotPasswordEmailServlet extends HttpServlet {
 
                 if (isTokenRegistered == true) {
                     // Envia o e-mail de solicitação de alteração de senha para o e-mail do usuário
-                    forgotPasswordEmailResponse = ForgotPasswordEmailManager.sendForgotPasswordEmail(name, email, forgotPasswordToken);
+                    forgotPasswordEmailJsonResponse = ForgotPasswordEmailManager.sendForgotPasswordEmail(name, email, forgotPasswordToken);
                 } else {
-                    forgotPasswordEmailResponse.put("isForgotPasswordEmailSent", false);
-                    forgotPasswordEmailResponse.put("message", "Houve um erro inesperado ao registrar o token. Tente novamente.");                    
+                    forgotPasswordEmailJsonResponse.put("isForgotPasswordEmailSent", false);
+                    forgotPasswordEmailJsonResponse.put("message", "Houve um erro inesperado ao registrar o token. Tente novamente.");                    
                 }
             }
         } catch (Exception ex) {
-            forgotPasswordEmailResponse.put("isForgotPasswordEmailSent", false);
-            forgotPasswordEmailResponse.put("message", "Erro inesperado: " + ex.getMessage());
+            forgotPasswordEmailJsonResponse.put("isForgotPasswordEmailSent", false);
+            forgotPasswordEmailJsonResponse.put("message", "Erro inesperado: " + ex.getMessage());
         }
         
-        response.getWriter().write(forgotPasswordEmailResponse.toString());
+        response.getWriter().write(forgotPasswordEmailJsonResponse.toString());
     }
 
     @Override

@@ -67,7 +67,7 @@ public class RegisterEmailManager {
         * @author                   isaquesv
     */
     public static JSONObject sendRegisterEmail(String name, String email, String registerToken) {
-        JSONObject registerEmailResponse = new JSONObject();
+        JSONObject registerEmailJsonResponse = new JSONObject();
         
         String emailHTMLBody = createRegisterEmailHTMLBody(name, registerToken);
         String completeMessage  = String.format("""
@@ -101,18 +101,18 @@ public class RegisterEmailManager {
 
             // Sucesso no envio do email
             if (response.statusCode() == 201) {
-                registerEmailResponse.put("isRegisterEmailSent", true);
-                registerEmailResponse.put("message", "Enviamos um e-mail de confirmação para: <b>" + email + "</b>. Para concluir o seu cadastro, acesse o e-mail e clique no link de confirmação.");
+                registerEmailJsonResponse.put("isRegisterEmailSent", true);
+                registerEmailJsonResponse.put("message", "Enviamos um e-mail de confirmação para: <b>" + email + "</b>. Para concluir o seu cadastro, acesse o e-mail e clique no link de confirmação.");
             } else {
-                registerEmailResponse.put("isRegisterEmailSent", false);
-                registerEmailResponse.put("message", "Erro ao enviar e-mail. Código de erro: " + response.statusCode() + ". Detalhes: " + response.body());
+                registerEmailJsonResponse.put("isRegisterEmailSent", false);
+                registerEmailJsonResponse.put("message", "Erro ao enviar e-mail. Código de erro: " + response.statusCode() + ". Detalhes: " + response.body());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            registerEmailResponse.put("isRegisterEmailSent", false);
-            registerEmailResponse.put("message", "Erro ao enviar e-mail: " + e.getMessage());
+            registerEmailJsonResponse.put("isRegisterEmailSent", false);
+            registerEmailJsonResponse.put("message", "Erro ao enviar e-mail: " + e.getMessage());
         }
         
-        return registerEmailResponse;
+        return registerEmailJsonResponse;
     }
 }

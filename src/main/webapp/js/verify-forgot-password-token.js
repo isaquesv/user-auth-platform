@@ -52,13 +52,13 @@ function checkIfForgotPasswordTokenExistsInDatabase(forgotPasswordToken) {
             forgotPasswordToken: forgotPasswordToken
         },
         dataType: 'json',
-        success: function (forgotPasswordTokenExistenceResponse) {
-            if (forgotPasswordTokenExistenceResponse.isForgotPasswordTokenExistsInDatabase == true) {
+        success: function (forgotPasswordTokenExistenceJsonResponse) {
+            if (forgotPasswordTokenExistenceJsonResponse.isForgotPasswordTokenExistsInDatabase == true) {
                 showOrHideChangePasswordForm(true);
                 passwordInput.focus();
             } else {
                 showOrHideChangePasswordForm(false);
-                invalidTokenMessage.innerHTML = forgotPasswordTokenExistenceResponse.message;
+                invalidTokenMessage.innerHTML = forgotPasswordTokenExistenceJsonResponse.message;
             }
         },
         error: function (xhr, status, error) {
@@ -125,11 +125,11 @@ function changePassword(forgotPasswordToken, password) {
             password: password
         },
         dataType: 'json',
-        success: function (changePasswordResponse) {
-            if (changePasswordResponse.isPasswordChanged == true) {
+        success: function (changePasswordJsonResponse) {
+            if (changePasswordJsonResponse.isPasswordChanged == true) {
                 window.location.href = "home.jsp";
             } else {
-                passwordMessage.innerHTML = changePasswordResponse.message;
+                passwordMessage.innerHTML = changePasswordJsonResponse.message;
             }
         },
         error: function (xhr, status, error) {

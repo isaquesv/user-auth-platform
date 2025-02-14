@@ -25,11 +25,11 @@ function checkIfRegisterTokenExistsInDatabase(registerToken) {
             registerToken: registerToken
         },
         dataType: 'json',
-        success: function (registerTokenExistenceResponse) {
-            if (registerTokenExistenceResponse.isRegisterTokenExistsInDatabase == true) {
+        success: function (registerTokenExistenceJsonResponse) {
+            if (registerTokenExistenceJsonResponse.isRegisterTokenInDatabase == true) {
                 window.location.href = "home.jsp";
             } else {
-                invalidTokenMessage.innerHTML = registerTokenExistenceResponse.message;
+                invalidTokenMessage.innerHTML = registerTokenExistenceJsonResponse.message;
             }
         },
         error: function (xhr, status, error) {

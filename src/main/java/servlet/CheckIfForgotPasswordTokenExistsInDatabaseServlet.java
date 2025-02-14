@@ -22,23 +22,23 @@ public class CheckIfForgotPasswordTokenExistsInDatabaseServlet extends HttpServl
         response.setCharacterEncoding("UTF-8");
         
         String forgotPasswordToken = request.getParameter("forgotPasswordToken");
-        JSONObject forgotPasswordTokenExistenceResponse = new JSONObject();
+        JSONObject forgotPasswordTokenExistenceJsonResponse = new JSONObject();
         
         try {
             if (forgotPasswordToken == null || forgotPasswordToken.trim().isEmpty()) {
-                forgotPasswordTokenExistenceResponse.put("isForgotPasswordTokenExistsInDatabase", false);
-                forgotPasswordTokenExistenceResponse.put("message", "Houve um erro inesperado ao enviar o parâmetro (token). Tente novamente.");
+                forgotPasswordTokenExistenceJsonResponse.put("isForgotPasswordTokenExistsInDatabase", false);
+                forgotPasswordTokenExistenceJsonResponse.put("message", "Houve um erro inesperado ao enviar o parâmetro (token). Tente novamente.");
             } else {
                 ForgotPasswordToken.createForgotPasswordTokenTable();
                 // Verificando se o token de solicitação de alteração de senha existe no banco de dados e se é válido
-                forgotPasswordTokenExistenceResponse = ForgotPasswordToken.getForgotPasswordToken(forgotPasswordToken);
+                forgotPasswordTokenExistenceJsonResponse = ForgotPasswordToken.getForgotPasswordToken(forgotPasswordToken);
             }
         } catch (Exception ex) {
-            forgotPasswordTokenExistenceResponse.put("isForgotPasswordTokenExistsInDatabase", false);
-            forgotPasswordTokenExistenceResponse.put("message", "Erro inesperado: " + ex.getMessage());
+            forgotPasswordTokenExistenceJsonResponse.put("isForgotPasswordTokenExistsInDatabase", false);
+            forgotPasswordTokenExistenceJsonResponse.put("message", "Erro inesperado: " + ex.getMessage());
         }
         
-        response.getWriter().write(forgotPasswordTokenExistenceResponse.toString());
+        response.getWriter().write(forgotPasswordTokenExistenceJsonResponse.toString());
     }
 
     @Override

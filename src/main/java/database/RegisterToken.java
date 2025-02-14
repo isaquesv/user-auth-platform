@@ -47,7 +47,7 @@ public class RegisterToken {
         * @author                   isaquesv
     */
     public static JSONObject getRegisterToken(String registerToken) throws Exception {
-        JSONObject registerTokenExistenceResponse = new JSONObject();
+        JSONObject registerTokenExistenceJsonResponse = new JSONObject();
         
         try {
             Connection databaseConnection = DatabaseConnection.getConnection();
@@ -72,18 +72,18 @@ public class RegisterToken {
                 if (expiresAt.isAfter(LocalDateTime.now()) && tokenDatabase.equals(registerToken)) {
                     setRegisterTokenStatus(registerToken);
                     
-                    registerTokenExistenceResponse.put("isRegisterTokenExistsInDatabase", true);
-                    registerTokenExistenceResponse.put("name", name);
-                    registerTokenExistenceResponse.put("email", email);
-                    registerTokenExistenceResponse.put("password", password);
-                    registerTokenExistenceResponse.put("message", "Token validado com sucesso!");
+                    registerTokenExistenceJsonResponse.put("isRegisterTokenInDatabase", true);
+                    registerTokenExistenceJsonResponse.put("name", name);
+                    registerTokenExistenceJsonResponse.put("email", email);
+                    registerTokenExistenceJsonResponse.put("password", password);
+                    registerTokenExistenceJsonResponse.put("message", "Token validado com sucesso!");
                 } else {
-                    registerTokenExistenceResponse.put("isRegisterTokenExistsInDatabase", false);
-                    registerTokenExistenceResponse.put("message", "Sentimos muito! Este link de confirmação de cadastro está expirado. Por favor, solicite o envio de outro e-mail para concluir seu cadastro. Se precisar de ajuda, entre em contato com o suporte: <a href='https://github.com/isaquesv/user-auth-platform/issues'>clique aqui</a>.");
+                    registerTokenExistenceJsonResponse.put("isRegisterTokenInDatabase", false);
+                    registerTokenExistenceJsonResponse.put("message", "Sentimos muito! Este link de confirmação de cadastro está expirado. Por favor, solicite o envio de outro e-mail para concluir seu cadastro. Se precisar de ajuda, entre em contato com o suporte: <a href='https://github.com/isaquesv/user-auth-platform/issues'>clique aqui</a>.");
                 }
             } else {
-                registerTokenExistenceResponse.put("isRegisterTokenExistsInDatabase", false);
-                registerTokenExistenceResponse.put("message", "Sentimos muito! Este link de confirmação de cadastro está incorreto ou expirado. Por favor, solicite o envio de outro e-mail para concluir seu cadastro. Se precisar de ajuda, entre em contato com o suporte: <a href='https://github.com/isaquesv/user-auth-platform/issues'>clique aqui</a>.");
+                registerTokenExistenceJsonResponse.put("isRegisterTokenInDatabase", false);
+                registerTokenExistenceJsonResponse.put("message", "Sentimos muito! Este link de confirmação de cadastro está incorreto ou expirado. Por favor, solicite o envio de outro e-mail para concluir seu cadastro. Se precisar de ajuda, entre em contato com o suporte: <a href='https://github.com/isaquesv/user-auth-platform/issues'>clique aqui</a>.");
             }
 
             result.close();
@@ -93,7 +93,7 @@ public class RegisterToken {
             System.err.println(e.getMessage());
         }
         
-        return registerTokenExistenceResponse;
+        return registerTokenExistenceJsonResponse;
     }
     
     /**

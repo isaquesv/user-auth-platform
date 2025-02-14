@@ -27,12 +27,12 @@ public class SendRegisterEmailServlet extends HttpServlet {
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        JSONObject registerEmailResponse = new JSONObject();
+        JSONObject registerEmailJsonResponse = new JSONObject();
         
         try {
             if ((name == null || name.trim().isEmpty()) || (email == null || email.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
-                registerEmailResponse.put("isRegisterEmailSent", false);
-                registerEmailResponse.put("message", "Houve um erro inesperado ao enviar os parâmetros (nome, e-mail, senha). Tente novamente.");
+                registerEmailJsonResponse.put("isRegisterEmailSent", false);
+                registerEmailJsonResponse.put("message", "Houve um erro inesperado ao enviar os parâmetros (nome, e-mail, senha). Tente novamente.");
             } else {
                 RegisterToken.createRegisterTokenTable();
                 // Gerando um token de cadastro de usuário e um hash, com base na senha do usuário
@@ -42,18 +42,18 @@ public class SendRegisterEmailServlet extends HttpServlet {
 
                 if (isTokenRegistered == true) {
                     // Envia o e-mail de confirmação de cadastro para o e-mail do usuário
-                    registerEmailResponse = RegisterEmailManager.sendRegisterEmail(name, email, registerToken);
+                    registerEmailJsonResponse = RegisterEmailManager.sendRegisterEmail(name, email, registerToken);
                 } else {
-                    registerEmailResponse.put("isRegisterEmailSent", false);
-                    registerEmailResponse.put("message", "Houve um erro inesperado ao registrar o token. Tente novamente.");                    
+                    registerEmailJsonResponse.put("isRegisterEmailSent", false);
+                    registerEmailJsonResponse.put("message", "Houve um erro inesperado ao registrar o token. Tente novamente.");                    
                 }
             }
         } catch (Exception ex) {
-            registerEmailResponse.put("isRegisterEmailSent", false);
-            registerEmailResponse.put("message", "Erro inesperado: " + ex.getMessage());
+            registerEmailJsonResponse.put("isRegisterEmailSent", false);
+            registerEmailJsonResponse.put("message", "Erro inesperado: " + ex.getMessage());
         }
         
-        response.getWriter().write(registerEmailResponse.toString());
+        response.getWriter().write(registerEmailJsonResponse.toString());
     }
 
     @Override

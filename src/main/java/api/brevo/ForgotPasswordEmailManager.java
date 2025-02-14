@@ -67,7 +67,7 @@ public class ForgotPasswordEmailManager {
         * @author                       isaquesv
     */
     public static JSONObject sendForgotPasswordEmail(String name, String email, String forgotPasswordToken) {
-        JSONObject forgotPasswordEmailResponse = new JSONObject();
+        JSONObject forgotPasswordEmailJsonResponse = new JSONObject();
         
         String emailHTMLBody = createForgotPasswordEmailHTMLBody(name, forgotPasswordToken);
         String completeMessage  = String.format("""
@@ -101,18 +101,18 @@ public class ForgotPasswordEmailManager {
 
             // Sucesso no envio do email
             if (response.statusCode() == 201) {
-                forgotPasswordEmailResponse.put("isForgotPasswordEmailSent", true);
-                forgotPasswordEmailResponse.put("message", "Enviamos um e-mail de alteração de senha para: <b>" + email + "</b>. Para concluir sua alteração, acesse o e-mail e clique no link de confirmação.");
+                forgotPasswordEmailJsonResponse.put("isForgotPasswordEmailSent", true);
+                forgotPasswordEmailJsonResponse.put("message", "Enviamos um e-mail de alteração de senha para: <b>" + email + "</b>. Para concluir sua alteração, acesse o e-mail e clique no link de confirmação.");
             } else {
-                forgotPasswordEmailResponse.put("isForgotPasswordEmailSent", false);
-                forgotPasswordEmailResponse.put("message", "Erro ao enviar e-mail. Código de erro: " + response.statusCode() + ". Detalhes: " + response.body());
+                forgotPasswordEmailJsonResponse.put("isForgotPasswordEmailSent", false);
+                forgotPasswordEmailJsonResponse.put("message", "Erro ao enviar e-mail. Código de erro: " + response.statusCode() + ". Detalhes: " + response.body());
             }
         } catch (Exception e) {
             e.printStackTrace();
-            forgotPasswordEmailResponse.put("isForgotPasswordEmailSent", false);
-            forgotPasswordEmailResponse.put("message", "Erro ao enviar e-mail: " + e.getMessage());
+            forgotPasswordEmailJsonResponse.put("isForgotPasswordEmailSent", false);
+            forgotPasswordEmailJsonResponse.put("message", "Erro ao enviar e-mail: " + e.getMessage());
         }
         
-        return forgotPasswordEmailResponse;
+        return forgotPasswordEmailJsonResponse;
     }
 }
